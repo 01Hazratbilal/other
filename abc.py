@@ -1,15 +1,6 @@
 import streamlit as st
-import pyttsx3
+from gtts import gTTS
 import base64
-
-# Initialize the text-to-speech engine
-engine = pyttsx3.init()
-
-# Get available voices
-voices = engine.getProperty('voices')
-
-# Get voice names
-voice_names = [voice.name for voice in voices]
 
 # Streamlit app layout
 st.title("Text-to-Speech App")
@@ -21,25 +12,18 @@ text = st.text_area("Text Input")
 # File uploader for text file
 uploaded_file = st.file_uploader("Upload a text file", type=["txt"])
 
-
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
     text = st.text_area("Text Input", value=text)
-    
 
 # Select voice
-selected_voice = st.selectbox("Select Voice", voice_names)
-
-# Get the index of the selected voice
-voice_index = voice_names.index(selected_voice)
-
-# Set voice
-engine.setProperty('voice', voices[voice_index].id)
+voices = ['en-us', 'en-uk', 'en-au']  # Example voices, you can modify this list
+selected_voice = st.selectbox("Select Voice", voices)
 
 # Convert text to speech
 if st.button("Convert to Speech"):
-    engine.save_to_file(text, "speech.mp3")
-    engine.runAndWait()
+    tts = gTTS(text=text, lang=selected_voice)
+    tts.save("speech.mp3")
 
     # Read the generated audio file
     audio_file = open("speech.mp3", "rb")
